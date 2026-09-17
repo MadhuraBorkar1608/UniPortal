@@ -1,44 +1,52 @@
 package com.uniportal.ui.admin.timetable;
 
+import com.uniportal.model.Department;
 import com.uniportal.model.Timetable;
+import com.uniportal.service.DepartmentService;
 import com.uniportal.service.TimetableService;
 import com.uniportal.ui.common.StyledButton;
+import com.uniportal.ui.common.TimetableMatrixPanel;
 import com.uniportal.util.UIUtils;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TimetableManagementPanel extends JPanel {
 
     private TimetableService service;
-    private JTable table;
-    private DefaultTableModel tableModel;
+    private DepartmentService deptService;
+    private JComboBox<String> deptComboBox;
+    private JTabbedPane tabbedPane;
+    private List<Timetable> allTimetables;
 
     public TimetableManagementPanel() {
         service = new TimetableService();
+        deptService = new DepartmentService();
+        
         setLayout(new BorderLayout());
         setBackground(UIUtils.COLOR_BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         topPanel.setOpaque(false);
+        
+        // Department Combo Box
+        deptComboBox = new JComboBox<>();
+        deptComboBox.addActionListener(e -> renderTimetables());
+        topPanel.add(new JLabel("Department: "));
+        topPanel.add(deptComboBox);
+        
         StyledButton addBtn = new StyledButton("Add Timetable Entry");
         addBtn.addActionListener(e -> showFormDialog(null));
         topPanel.add(addBtn);
         add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "Division", "Day", "Time", "Subject", "Faculty", "Classroom"};
-        tableModel = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) { return false; }
-        };
-        table = new JTable(tableModel);
-        UIUtils.styleTable(table);
-        table.setAutoCreateRowSorter(false);
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        tabbedPane = new JTabbedPane();
+        add(tabbedPane, BorderLayout.CENTER);
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.setOpaque(false);
@@ -46,22 +54,20 @@ public class TimetableManagementPanel extends JPanel {
         StyledButton deleteBtn = new StyledButton("Delete");
 
         editBtn.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row != -1) {
-                Timetable t = getTimetableFromRow(row);
+            Timetable t = getSelectedTimetableFromActiveTab();
+            if (t != null) {
                 showFormDialog(t);
             } else {
-                UIUtils.showError(this, "Please select an entry to edit.");
+                UIUtils.showError(this, "Please select an entry in the grid to edit.");
             }
         });
 
         deleteBtn.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row != -1) {
+            Timetable t = getSelectedTimetableFromActiveTab();
+            if (t != null) {
                 if (UIUtils.confirm(this, "Are you sure you want to delete this entry?")) {
-                    int id = (int) tableModel.getValueAt(row, 0);
                     try {
-                        service.deleteTimetable(id);
+                        service.deleteTimetable(t.getId());
                         UIUtils.showSuccess(this, "Deleted successfully.");
                         loadData();
                     } catch (Exception ex) {
@@ -69,32 +75,60 @@ public class TimetableManagementPanel extends JPanel {
                     }
                 }
             } else {
-                UIUtils.showError(this, "Please select an entry to delete.");
+                UIUtils.showError(this, "Please select an entry in the grid to delete.");
             }
         });
 
         bottomPanel.add(editBtn);
         bottomPanel.add(deleteBtn);
         add(bottomPanel, BorderLayout.SOUTH);
+        
+        loadDepartments();
     }
-
-    public void loadData() {
-        tableModel.setRowCount(0);
-        List<Timetable> list = service.getAllTimetables();
-        for (Timetable t : list) {
-            String timeStr = t.getStartTime() + " - " + t.getEndTime();
-            tableModel.addRow(new Object[]{
-                t.getId(), t.getDivision(), t.getDayOfWeek(), timeStr, 
-                t.getSubjectName(), t.getFacultyName(), t.getClassroom()
-            });
+    
+    private void loadDepartments() {
+        deptComboBox.removeAllItems();
+        List<Department> depts = deptService.getAllDepartments();
+        for (Department d : depts) {
+            deptComboBox.addItem(d.getDeptName());
         }
     }
 
-    private Timetable getTimetableFromRow(int row) {
-        int id = (int) tableModel.getValueAt(row, 0);
-        List<Timetable> list = service.getAllTimetables();
-        for(Timetable t : list) {
-            if(t.getId() == id) return t;
+    public void loadData() {
+        allTimetables = service.getAllTimetables();
+        renderTimetables();
+    }
+    
+    private void renderTimetables() {
+        if (allTimetables == null) return;
+        
+        String selectedDept = (String) deptComboBox.getSelectedItem();
+        if (selectedDept == null) return;
+        
+        tabbedPane.removeAll();
+        
+        List<Timetable> deptTimetables = allTimetables.stream()
+                .filter(t -> selectedDept.equals(t.getDeptName()))
+                .collect(Collectors.toList());
+                
+        // Group by division
+        Map<String, List<Timetable>> byDivision = deptTimetables.stream()
+                .collect(Collectors.groupingBy(Timetable::getDivision));
+                
+        // Sort divisions alphabetically
+        List<String> divisions = new ArrayList<>(byDivision.keySet());
+        divisions.sort(String::compareTo);
+        
+        for (String div : divisions) {
+            TimetableMatrixPanel matrixPanel = new TimetableMatrixPanel(byDivision.get(div));
+            tabbedPane.addTab("Division " + div, matrixPanel);
+        }
+    }
+
+    private Timetable getSelectedTimetableFromActiveTab() {
+        Component selectedTab = tabbedPane.getSelectedComponent();
+        if (selectedTab instanceof TimetableMatrixPanel) {
+            return ((TimetableMatrixPanel) selectedTab).getSelectedTimetable();
         }
         return null;
     }

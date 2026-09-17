@@ -8,20 +8,20 @@ import java.util.List;
 
 public class TimetableDAO {
 
-    public List<Timetable> getTimetableForDivision(String division, int courseId, int semester) {
+    public List<Timetable> getTimetableForDivision(String division, int deptId) {
         List<Timetable> list = new ArrayList<>();
         String query = "SELECT t.*, s.subject_name, f.full_name as faculty_name " +
                        "FROM college_timetable t " +
                        "JOIN subjects s ON t.subject_id = s.id " +
+                       "JOIN courses c ON s.course_id = c.id " +
                        "LEFT JOIN faculty f ON t.faculty_id = f.faculty_id " +
-                       "WHERE t.division = ? AND s.course_id = ? AND s.semester = ? " +
-                       "ORDER BY FIELD(t.day_of_week, 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'), t.start_time";
+                       "WHERE t.division = ? AND c.dept_id = ? " +
+                       "ORDER BY CASE t.day_of_week WHEN 'MONDAY' THEN 1 WHEN 'TUESDAY' THEN 2 WHEN 'WEDNESDAY' THEN 3 WHEN 'THURSDAY' THEN 4 WHEN 'FRIDAY' THEN 5 WHEN 'SATURDAY' THEN 6 ELSE 7 END, t.start_time";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             
             stmt.setString(1, division);
-            stmt.setInt(2, courseId);
-            stmt.setInt(3, semester);
+            stmt.setInt(2, deptId);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
@@ -46,11 +46,13 @@ public class TimetableDAO {
 
     public List<Timetable> getAllTimetables() {
         List<Timetable> list = new ArrayList<>();
-        String query = "SELECT t.*, s.subject_name, f.full_name as faculty_name " +
+        String query = "SELECT t.*, s.subject_name, f.full_name as faculty_name, d.dept_name " +
                        "FROM college_timetable t " +
                        "JOIN subjects s ON t.subject_id = s.id " +
+                       "JOIN courses c ON s.course_id = c.id " +
+                       "JOIN departments d ON c.dept_id = d.id " +
                        "LEFT JOIN faculty f ON t.faculty_id = f.faculty_id " +
-                       "ORDER BY t.division, FIELD(t.day_of_week, 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'), t.start_time";
+                       "ORDER BY d.dept_name, t.division, CASE t.day_of_week WHEN 'MONDAY' THEN 1 WHEN 'TUESDAY' THEN 2 WHEN 'WEDNESDAY' THEN 3 WHEN 'THURSDAY' THEN 4 WHEN 'FRIDAY' THEN 5 WHEN 'SATURDAY' THEN 6 ELSE 7 END, t.start_time";
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -66,6 +68,7 @@ public class TimetableDAO {
                 t.setDivision(rs.getString("division"));
                 t.setSubjectName(rs.getString("subject_name"));
                 t.setFacultyName(rs.getString("faculty_name"));
+                t.setDeptName(rs.getString("dept_name"));
                 list.add(t);
             }
         } catch (SQLException e) {

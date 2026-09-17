@@ -21,13 +21,7 @@ public class DepartmentManagementPanel extends JPanel {
         setBackground(UIUtils.COLOR_BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        // Top Panel with Add Button
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        topPanel.setOpaque(false);
-        StyledButton addBtn = new StyledButton("Add Department");
-        addBtn.addActionListener(e -> showFormDialog(null));
-        topPanel.add(addBtn);
-        add(topPanel, BorderLayout.NORTH);
+        // Top Panel removed as Add Department is no longer allowed
 
         // Table
         String[] columns = {"ID", "Code", "Name", "Description"};

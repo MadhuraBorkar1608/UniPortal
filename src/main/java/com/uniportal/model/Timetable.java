@@ -15,6 +15,7 @@ public class Timetable {
     // Derived
     private String subjectName;
     private String facultyName;
+    private String deptName;
 
     public Timetable() {}
 
@@ -47,4 +48,7 @@ public class Timetable {
 
     public String getFacultyName() { return facultyName; }
     public void setFacultyName(String facultyName) { this.facultyName = facultyName; }
+
+    public String getDeptName() { return deptName; }
+    public void setDeptName(String deptName) { this.deptName = deptName; }
 }

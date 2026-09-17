@@ -12,9 +12,9 @@ public class TimetableService {
         this.dao = new TimetableDAO();
     }
 
-    public List<Timetable> getStudentTimetable(String division, int courseId, int semester) {
+    public List<Timetable> getStudentTimetable(String division, int deptId) {
         try {
-            List<Timetable> result = dao.getTimetableForDivision(division, courseId, semester);
+            List<Timetable> result = dao.getTimetableForDivision(division, deptId);
             if (result != null && !result.isEmpty()) return result;
         } catch (Exception e) {}
         

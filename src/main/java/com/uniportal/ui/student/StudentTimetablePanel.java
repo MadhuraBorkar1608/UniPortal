@@ -4,10 +4,11 @@ import com.uniportal.model.Student;
 import com.uniportal.model.Timetable;
 import com.uniportal.service.StudentService;
 import com.uniportal.service.TimetableService;
+import com.uniportal.ui.common.TimetableMatrixPanel;
 import com.uniportal.util.SessionManager;
 import com.uniportal.util.UIUtils;
+
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
@@ -15,8 +16,7 @@ public class StudentTimetablePanel extends JPanel {
 
     private TimetableService timetableService;
     private StudentService studentService;
-    private JTable table;
-    private DefaultTableModel tableModel;
+    private JPanel gridContainer;
 
     public StudentTimetablePanel() {
         timetableService = new TimetableService();
@@ -32,36 +32,22 @@ public class StudentTimetablePanel extends JPanel {
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
 
-        String[] columns = {"Day", "Start Time", "End Time", "Subject", "Faculty", "Classroom"};
-        tableModel = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(int row, int column) { return false; }
-        };
-        table = new JTable(tableModel);
-        UIUtils.styleTable(table);
-        table.setAutoCreateRowSorter(false); // disable sorting to keep day order
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        add(scrollPane, BorderLayout.CENTER);
+        gridContainer = new JPanel(new BorderLayout());
+        gridContainer.setOpaque(false);
+        add(gridContainer, BorderLayout.CENTER);
     }
     
     public void loadData() {
-        tableModel.setRowCount(0);
+        gridContainer.removeAll();
         if (SessionManager.isAuthenticated()) {
             Student s = studentService.getStudentProfile(SessionManager.getCurrentUser().getId());
             if (s != null) {
-                List<Timetable> schedule = timetableService.getStudentTimetable(s.getDivision(), s.getCourseId(), s.getCurrentSemester());
-                for (Timetable t : schedule) {
-                    tableModel.addRow(new Object[]{
-                        t.getDayOfWeek(), 
-                        t.getStartTime().toString(), 
-                        t.getEndTime().toString(),
-                        t.getSubjectName(), 
-                        t.getFacultyName() != null ? t.getFacultyName() : "N/A", 
-                        t.getClassroom()
-                    });
-                }
+                List<Timetable> schedule = timetableService.getStudentTimetable(s.getDivision(), s.getDeptId());
+                TimetableMatrixPanel matrixPanel = new TimetableMatrixPanel(schedule);
+                gridContainer.add(matrixPanel, BorderLayout.CENTER);
             }
         }
+        gridContainer.revalidate();
+        gridContainer.repaint();
     }
 }

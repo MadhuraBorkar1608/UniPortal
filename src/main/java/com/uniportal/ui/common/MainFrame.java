@@ -148,16 +148,6 @@ public class MainFrame extends JFrame {
                 showPanel("StudentNotices", "Notices");
             });
 
-            sidebar.addMenuButton("Calendar", "StudentCalendar", e -> {
-                for (Component comp : contentPanel.getComponents()) {
-                    if (comp instanceof com.uniportal.ui.student.StudentCalendarPanel) {
-                        try { try { ((com.uniportal.ui.student.StudentCalendarPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
-                        break;
-                    }
-                }
-                showPanel("StudentCalendar", "Academic Calendar");
-            });
-
             // Add stubs for future menus
             sidebar.addMenuButton("Change Password", "ChangePassword", e -> new com.uniportal.ui.auth.ChangePasswordDialog(this).setVisible(true));
         } else if ("ADMIN".equals(role)) {
