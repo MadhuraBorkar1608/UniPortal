@@ -1,6 +1,6 @@
 package com.uniportal.ui.admin.events;
 
-import com.uniportal.model.Event;
+import com.uniportal.model.CalendarEvent;
 import com.uniportal.service.EventService;
 import com.uniportal.ui.common.StyledButton;
 import com.uniportal.util.UIUtils;
@@ -23,12 +23,12 @@ public class EventManagementPanel extends JPanel {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         topPanel.setOpaque(false);
-        StyledButton addBtn = new StyledButton("Add Event");
+        StyledButton addBtn = new StyledButton("Add Academic Event");
         addBtn.addActionListener(e -> showFormDialog(null));
         topPanel.add(addBtn);
         add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"ID", "Event Name", "Date", "Venue", "Status", "Organizer"};
+        String[] columns = {"ID", "Type", "Title", "Date", "Duration", "Subject", "Status"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -44,12 +44,11 @@ public class EventManagementPanel extends JPanel {
         bottomPanel.setOpaque(false);
         StyledButton editBtn = new StyledButton("Edit");
         StyledButton deleteBtn = new StyledButton("Delete");
-        StyledButton viewRegsBtn = new StyledButton("View Registrations");
 
         editBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
-                Event ev = getEventFromRow(row);
+                CalendarEvent ev = getEventFromRow(row);
                 showFormDialog(ev);
             } else {
                 UIUtils.showError(this, "Please select an event to edit.");
@@ -74,43 +73,31 @@ public class EventManagementPanel extends JPanel {
             }
         });
 
-        viewRegsBtn.addActionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row != -1) {
-                Event ev = getEventFromRow(row);
-                EventRegistrationsDialog dialog = new EventRegistrationsDialog(SwingUtilities.getWindowAncestor(this), ev);
-                dialog.setVisible(true);
-            } else {
-                UIUtils.showError(this, "Please select an event to view registrations.");
-            }
-        });
-
         bottomPanel.add(editBtn);
         bottomPanel.add(deleteBtn);
-        bottomPanel.add(viewRegsBtn);
         add(bottomPanel, BorderLayout.SOUTH);
     }
 
     public void loadData() {
         tableModel.setRowCount(0);
-        List<Event> list = service.getAllEvents();
-        for (Event e : list) {
+        List<CalendarEvent> list = service.getAllEvents();
+        for (CalendarEvent e : list) {
             tableModel.addRow(new Object[]{
-                e.getId(), e.getEventName(), e.getEventDate(), e.getVenue(), e.getStatus(), e.getOrganizer()
+                e.getId(), e.getEventType(), e.getTitle(), e.getEventDate(), e.getDurationMinutes() + " mins", e.getSubjectId(), e.getStatus()
             });
         }
     }
 
-    private Event getEventFromRow(int row) {
+    private CalendarEvent getEventFromRow(int row) {
         int id = (int) tableModel.getValueAt(row, 0);
-        List<Event> list = service.getAllEvents();
-        for (Event e : list) {
+        List<CalendarEvent> list = service.getAllEvents();
+        for (CalendarEvent e : list) {
             if (e.getId() == id) return e;
         }
         return null;
     }
 
-    private void showFormDialog(Event ev) {
+    private void showFormDialog(CalendarEvent ev) {
         EventFormDialog dialog = new EventFormDialog(SwingUtilities.getWindowAncestor(this), ev, service);
         dialog.setVisible(true);
         if (dialog.isSaved()) {

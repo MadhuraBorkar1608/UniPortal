@@ -37,10 +37,10 @@ public class UIUtils {
     }
     
     // Standard Colors (Modern UI)
-    public static final Color COLOR_PRIMARY = new Color(93, 95, 239); // Vibrant Purple/Blue
+    public static final Color COLOR_PRIMARY = new Color(10, 35, 66); // Dark Navy Blue
     public static final Color COLOR_BACKGROUND = new Color(248, 249, 253); // Light grayish blue
-    public static final Color COLOR_SIDEBAR = new Color(26, 29, 45); // Very dark blue
-    public static final Color COLOR_SIDEBAR_HOVER = new Color(52, 56, 84); // Lighter dark blue
+    public static final Color COLOR_SIDEBAR = new Color(10, 25, 47); // Very dark navy
+    public static final Color COLOR_SIDEBAR_HOVER = new Color(23, 42, 69); // Lighter navy
     public static final Color COLOR_TEXT_LIGHT = new Color(255, 255, 255);
     public static final Color COLOR_TEXT_DARK = new Color(33, 37, 41);
     public static final Color COLOR_TEXT_MUTED = new Color(108, 117, 125);

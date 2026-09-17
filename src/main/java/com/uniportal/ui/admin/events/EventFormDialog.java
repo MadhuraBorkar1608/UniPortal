@@ -1,8 +1,6 @@
 package com.uniportal.ui.admin.events;
 
-import com.uniportal.model.Department;
-import com.uniportal.model.Event;
-import com.uniportal.service.DepartmentService;
+import com.uniportal.model.CalendarEvent;
 import com.uniportal.service.EventService;
 import com.uniportal.ui.common.StyledButton;
 import com.uniportal.util.UIUtils;
@@ -10,98 +8,87 @@ import javax.swing.*;
 import java.awt.*;
 import java.sql.Date;
 import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.List;
+import java.text.SimpleDateFormat;
 
 public class EventFormDialog extends JDialog {
 
-    private JTextField nameField;
-    private JTextArea descArea;
+    private JTextField titleField;
+    private JTextArea descriptionArea;
     private JTextField dateField;
     private JTextField timeField;
-    private JTextField venueField;
-    private JTextField organizerField;
-    private JComboBox<DeptItem> deptCombo;
-    private JTextField capacityField;
+    private JComboBox<String> typeCombo;
+    private JTextField durationField;
+    private JTextField subjectIdField;
+    private JTextField deptIdField;
     private JComboBox<String> statusCombo;
-    private JTextField regDeadlineField;
     
-    private Event event;
-    private EventService service;
     private boolean saved = false;
+    private CalendarEvent event;
+    private EventService service;
 
-    public EventFormDialog(Window owner, Event event, EventService service) {
-        super(owner, event == null ? "Add Event" : "Edit Event", ModalityType.APPLICATION_MODAL);
+    public EventFormDialog(Window owner, CalendarEvent event, EventService service) {
+        super(owner, event == null ? "Add Academic Event" : "Edit Academic Event", ModalityType.APPLICATION_MODAL);
         this.event = event;
         this.service = service;
         
         setSize(500, 600);
         setLocationRelativeTo(owner);
-        setLayout(new BorderLayout());
         
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(UIUtils.COLOR_BACKGROUND);
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
         
         int row = 0;
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Event Name:"), gbc);
-        nameField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(nameField, gbc);
+        titleField = addField(panel, gbc, row++, "Title:");
+        
+        gbc.gridx = 0; gbc.gridy = row;
+        panel.add(new JLabel("Description:"), gbc);
+        descriptionArea = new JTextArea(3, 20);
+        descriptionArea.setLineWrap(true);
+        gbc.gridx = 1;
+        panel.add(new JScrollPane(descriptionArea), gbc);
         row++;
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Date (YYYY-MM-DD):"), gbc);
-        dateField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(dateField, gbc);
-        row++;
-
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Time (HH:MM:SS):"), gbc);
-        timeField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(timeField, gbc);
-        row++;
+        dateField = addField(panel, gbc, row++, "Date (YYYY-MM-DD):");
+        timeField = addField(panel, gbc, row++, "Time (HH:MM):");
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Venue:"), gbc);
-        venueField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(venueField, gbc);
+        gbc.gridx = 0; gbc.gridy = row;
+        panel.add(new JLabel("Event Type:"), gbc);
+        typeCombo = new JComboBox<>(new String[]{"THEORY_EXAM", "PRACTICAL_EXAM", "UNIT_TEST", "HOLIDAY", "OTHER"});
+        gbc.gridx = 1;
+        panel.add(typeCombo, gbc);
         row++;
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Organizer:"), gbc);
-        organizerField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(organizerField, gbc);
+        durationField = addField(panel, gbc, row++, "Duration (mins):");
+        subjectIdField = addField(panel, gbc, row++, "Subject ID:");
+        deptIdField = addField(panel, gbc, row++, "Dept ID (Optional):");
+        
+        gbc.gridx = 0; gbc.gridy = row;
+        panel.add(new JLabel("Status:"), gbc);
+        statusCombo = new JComboBox<>(new String[]{"SCHEDULED", "COMPLETED", "CANCELLED"});
+        gbc.gridx = 1;
+        panel.add(statusCombo, gbc);
         row++;
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Department:"), gbc);
-        deptCombo = new JComboBox<>();
-        deptCombo.addItem(new DeptItem(0, "All Departments (College-Wide)"));
-        loadDepts();
-        gbc.gridx = 1; formPanel.add(deptCombo, gbc);
-        row++;
+        if (event != null) {
+            titleField.setText(event.getTitle());
+            descriptionArea.setText(event.getDescription());
+            if (event.getEventDate() != null) dateField.setText(event.getEventDate().toString());
+            if (event.getEventTime() != null) timeField.setText(event.getEventTime().toString().substring(0, 5));
+            typeCombo.setSelectedItem(event.getEventType());
+            durationField.setText(String.valueOf(event.getDurationMinutes()));
+            subjectIdField.setText(event.getSubjectId() > 0 ? String.valueOf(event.getSubjectId()) : "");
+            deptIdField.setText(event.getDeptId() > 0 ? String.valueOf(event.getDeptId()) : "");
+            statusCombo.setSelectedItem(event.getStatus());
+        }
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Capacity:"), gbc);
-        capacityField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(capacityField, gbc);
-        row++;
-        
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Reg Deadline (YYYY-MM-DD HH:MM:SS):"), gbc);
-        regDeadlineField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(regDeadlineField, gbc);
-        row++;
-        
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Status:"), gbc);
-        statusCombo = new JComboBox<>(new String[]{"DRAFT", "PUBLISHED", "COMPLETED", "CANCELLED"});
-        gbc.gridx = 1; formPanel.add(statusCombo, gbc);
-        row++;
-        
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("Description:"), gbc);
-        descArea = new JTextArea(4, 20);
-        descArea.setLineWrap(true);
-        gbc.gridx = 1; formPanel.add(new JScrollPane(descArea), gbc);
-        
-        add(formPanel, BorderLayout.CENTER);
-        
-        JPanel btnPanel = new JPanel();
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        btnPanel.setOpaque(false);
         StyledButton saveBtn = new StyledButton("Save");
         StyledButton cancelBtn = new StyledButton("Cancel");
         
@@ -110,89 +97,58 @@ public class EventFormDialog extends JDialog {
         
         btnPanel.add(saveBtn);
         btnPanel.add(cancelBtn);
-        add(btnPanel, BorderLayout.SOUTH);
         
-        if (event != null) {
-            nameField.setText(event.getEventName());
-            dateField.setText(event.getEventDate() != null ? event.getEventDate().toString() : "");
-            timeField.setText(event.getEventTime() != null ? event.getEventTime().toString() : "");
-            venueField.setText(event.getVenue());
-            organizerField.setText(event.getOrganizer());
-            capacityField.setText(String.valueOf(event.getCapacity()));
-            regDeadlineField.setText(event.getRegistrationDeadline() != null ? event.getRegistrationDeadline().toString() : "");
-            statusCombo.setSelectedItem(event.getStatus());
-            descArea.setText(event.getDescription());
-            
-            for (int i = 0; i < deptCombo.getItemCount(); i++) {
-                if (event.getDeptId() != null && deptCombo.getItemAt(i).id == event.getDeptId()) {
-                    deptCombo.setSelectedIndex(i);
-                    break;
-                }
-            }
-        }
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 2;
+        panel.add(btnPanel, gbc);
+        
+        add(panel);
     }
     
-    private void loadDepts() {
-        DepartmentService ds = new DepartmentService();
-        List<Department> list = ds.getAllDepartments();
-        for (Department d : list) {
-            deptCombo.addItem(new DeptItem(d.getId(), d.getDeptName()));
-        }
+    private JTextField addField(JPanel panel, GridBagConstraints gbc, int row, String label) {
+        gbc.gridx = 0; gbc.gridy = row; gbc.gridwidth = 1;
+        panel.add(new JLabel(label), gbc);
+        JTextField field = new JTextField(20);
+        gbc.gridx = 1;
+        panel.add(field, gbc);
+        return field;
     }
     
     private void save() {
         try {
-            Event e = event == null ? new Event() : event;
-            e.setEventName(nameField.getText().trim());
-            e.setDescription(descArea.getText().trim());
+            if (event == null) event = new CalendarEvent();
+            event.setTitle(titleField.getText());
+            event.setDescription(descriptionArea.getText());
+            event.setEventDate(Date.valueOf(dateField.getText()));
+            event.setEventTime(Time.valueOf(timeField.getText() + ":00"));
+            event.setEventType(typeCombo.getSelectedItem().toString());
             
-            if (!dateField.getText().trim().isEmpty()) {
-                e.setEventDate(Date.valueOf(dateField.getText().trim()));
-            }
-            if (!timeField.getText().trim().isEmpty()) {
-                e.setEventTime(Time.valueOf(timeField.getText().trim()));
-            }
+            try {
+                event.setDurationMinutes(Integer.parseInt(durationField.getText()));
+            } catch (Exception e) {}
             
-            e.setVenue(venueField.getText().trim());
-            e.setOrganizer(organizerField.getText().trim());
+            try {
+                event.setSubjectId(Integer.parseInt(subjectIdField.getText()));
+            } catch (Exception e) {}
             
-            DeptItem selDept = (DeptItem) deptCombo.getSelectedItem();
-            if (selDept != null && selDept.id > 0) {
-                e.setDeptId(selDept.id);
+            try {
+                event.setDeptId(Integer.parseInt(deptIdField.getText()));
+            } catch (Exception e) {}
+            
+            event.setStatus(statusCombo.getSelectedItem().toString());
+            
+            if (event.getId() == 0) {
+                service.addEvent(event);
             } else {
-                e.setDeptId(null);
-            }
-            
-            e.setCapacity(capacityField.getText().trim().isEmpty() ? 0 : Integer.parseInt(capacityField.getText().trim()));
-            
-            if (!regDeadlineField.getText().trim().isEmpty()) {
-                e.setRegistrationDeadline(Timestamp.valueOf(regDeadlineField.getText().trim()));
-            }
-            
-            e.setStatus((String) statusCombo.getSelectedItem());
-            
-            if (event == null) {
-                service.addEvent(e);
-            } else {
-                service.updateEvent(e);
+                service.updateEvent(event);
             }
             saved = true;
             dispose();
-        } catch (IllegalArgumentException ex) {
-            UIUtils.showError(this, "Invalid date/time/number format.");
-        } catch (Exception ex) {
-            UIUtils.showError(this, ex.getMessage());
+        } catch (Exception e) {
+            UIUtils.showError(this, e.getMessage());
         }
     }
     
     public boolean isSaved() {
         return saved;
-    }
-    
-    private static class DeptItem {
-        int id;
-        String name;
-        DeptItem(int id, String name) { this.id = id; this.name = name; }
-        @Override public String toString() { return name; }
     }
 }

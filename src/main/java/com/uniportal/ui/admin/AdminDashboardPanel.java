@@ -56,28 +56,6 @@ public class AdminDashboardPanel extends JPanel {
         
         add(centerContent, BorderLayout.CENTER);
 
-        // Right Side Banner Area
-        JPanel rightBannerPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                GradientPaint gp = new GradientPaint(0, 0, new Color(93, 95, 239), 0, getHeight(), new Color(63, 61, 150));
-                g2d.setPaint(gp);
-                g2d.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 20, 20);
-                g2d.dispose();
-            }
-        };
-        rightBannerPanel.setPreferredSize(new Dimension(250, 0));
-        rightBannerPanel.setLayout(new GridBagLayout());
-        
-        JLabel quoteLabel = new JLabel("<html><div style='text-align: center;'>Administer<br>with<br>Excellence.</div></html>");
-        quoteLabel.setFont(new Font("Inter", Font.BOLD, 24));
-        quoteLabel.setForeground(Color.WHITE);
-        rightBannerPanel.add(quoteLabel);
-
-        add(rightBannerPanel, BorderLayout.EAST);
     }
     
     private DashboardCard createSummaryCard(String title, String value, Color valueColor) {

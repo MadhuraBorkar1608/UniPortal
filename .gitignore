@@ -43,3 +43,9 @@ buildNumber.properties
 .project
 .classpath
 .settings/
+
+# Database files
+*.db
+
+# Test files
+test_db.java

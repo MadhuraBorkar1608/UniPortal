@@ -1,6 +1,6 @@
 package com.uniportal.ui.student;
 
-import com.uniportal.model.Event;
+import com.uniportal.model.CalendarEvent;
 import com.uniportal.model.Student;
 import com.uniportal.service.EventService;
 import com.uniportal.service.StudentService;
@@ -17,7 +17,7 @@ public class StudentEventPanel extends JPanel {
     private StudentService studentService;
     private JTable table;
     private DefaultTableModel tableModel;
-    private List<Event> eventList;
+    private List<CalendarEvent> eventList;
 
     public StudentEventPanel() {
         eventService = new EventService();
@@ -27,13 +27,13 @@ public class StudentEventPanel extends JPanel {
         setBackground(UIUtils.COLOR_BACKGROUND);
         setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-        JLabel titleLabel = new JLabel("Events & Activities");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        JLabel titleLabel = new JLabel("Academic Calendar");
+        titleLabel.setFont(new Font("Inter", Font.BOLD, 24));
         titleLabel.setForeground(UIUtils.COLOR_PRIMARY);
         titleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(titleLabel, BorderLayout.NORTH);
 
-        String[] columns = {"Event Name", "Date", "Time", "Venue", "Dept", "Status"};
+        String[] columns = {"Type", "Event Title", "Date", "Time", "Duration", "Status"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -43,13 +43,6 @@ public class StudentEventPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
-        
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        bottomPanel.setOpaque(false);
-        JButton registerBtn = new JButton("Register for Event");
-        registerBtn.addActionListener(e -> registerEvent());
-        bottomPanel.add(registerBtn);
-        add(bottomPanel, BorderLayout.SOUTH);
     }
     
     public void loadData() {
@@ -58,38 +51,17 @@ public class StudentEventPanel extends JPanel {
             Student s = studentService.getStudentProfile(SessionManager.getCurrentUser().getId());
             if (s != null) {
                 eventList = eventService.getUpcomingEvents(s.getStudentId(), s.getDeptId());
-                for (Event e : eventList) {
+                for (CalendarEvent e : eventList) {
                     tableModel.addRow(new Object[]{
-                        e.getEventName(), 
+                        e.getEventType(),
+                        e.getTitle(), 
                         e.getEventDate().toString(), 
                         e.getEventTime().toString(),
-                        e.getVenue(), 
-                        e.getDeptName() != null ? e.getDeptName() : "All",
-                        e.isRegistered() ? "Registered" : "Not Registered"
+                        e.getDurationMinutes() + " mins", 
+                        e.getStatus()
                     });
                 }
             }
-        }
-    }
-    
-    private void registerEvent() {
-        int row = table.getSelectedRow();
-        if (row != -1) {
-            Event e = eventList.get(row);
-            if (e.isRegistered()) {
-                UIUtils.showError(this, "You are already registered for this event.");
-                return;
-            }
-            Student s = studentService.getStudentProfile(SessionManager.getCurrentUser().getId());
-            boolean success = eventService.registerForEvent(e.getId(), s.getStudentId());
-            if (success) {
-                UIUtils.showSuccess(this, "Successfully registered for " + e.getEventName());
-                loadData();
-            } else {
-                UIUtils.showError(this, "Failed to register. It may be full or deadline passed.");
-            }
-        } else {
-            UIUtils.showError(this, "Please select an event to register.");
         }
     }
 }

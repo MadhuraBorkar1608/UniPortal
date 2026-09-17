@@ -13,9 +13,9 @@ public class DatabaseConfig {
                 properties.load(is);
             } else {
                 // Fallback defaults for demo purposes
-                properties.setProperty("db.url", "jdbc:mysql://localhost:3306/college_management_system");
-                properties.setProperty("db.user", "root");
-                properties.setProperty("db.password", "maddiemysql@1516");
+                properties.setProperty("db.url", "jdbc:h2:./uniportal_db;MODE=MySQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE");
+                properties.setProperty("db.user", "sa");
+                properties.setProperty("db.password", "");
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -23,7 +23,7 @@ public class DatabaseConfig {
     }
 
     public static String getUrl() {
-        return properties.getProperty("db.url", "jdbc:mysql://localhost:3306/college_management_system");
+        return properties.getProperty("db.url", "jdbc:h2:./uniportal_db;MODE=MySQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE");
     }
 
     public static String getUser() {

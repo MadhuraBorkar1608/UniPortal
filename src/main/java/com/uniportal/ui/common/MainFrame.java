@@ -41,6 +41,19 @@ public class MainFrame extends JFrame {
     
     public void showPanel(String name, String title) {
         header.setTitle(title);
+        header.setIconsVisible(!"Login".equals(name));
+        sidebar.setVisible(!"Login".equals(name));
+        
+        try {
+            for (Component comp : contentPanel.getComponents()) {
+                if ("StudentProfile".equals(name) && comp instanceof com.uniportal.ui.student.StudentProfilePanel) {
+                    ((com.uniportal.ui.student.StudentProfilePanel) comp).loadProfile();
+                } else if ("AdminProfile".equals(name) && comp instanceof com.uniportal.ui.admin.AdminProfilePanel) {
+                    ((com.uniportal.ui.admin.AdminProfilePanel) comp).loadProfile();
+                }
+            }
+        } catch (Exception e) {}
+        
         cardLayout.show(contentPanel, name);
     }
     
@@ -65,20 +78,11 @@ public class MainFrame extends JFrame {
         
         if ("STUDENT".equals(role)) {
             sidebar.addMenuButton("Dashboard", "StudentDashboard", e -> showPanel("StudentDashboard", "Student Dashboard"));
-            sidebar.addMenuButton("My Profile", "StudentProfile", e -> {
-                for (Component comp : contentPanel.getComponents()) {
-                    if (comp instanceof com.uniportal.ui.student.StudentProfilePanel) {
-                        ((com.uniportal.ui.student.StudentProfilePanel) comp).loadProfile();
-                        break;
-                    }
-                }
-                showPanel("StudentProfile", "My Profile");
-            });
             
             sidebar.addMenuButton("My Timetable", "StudentTimetable", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentTimetablePanel) {
-                        ((com.uniportal.ui.student.StudentTimetablePanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentTimetablePanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -88,27 +92,26 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Study Material", "StudentMaterials", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentStudyMaterialPanel) {
-                        ((com.uniportal.ui.student.StudentStudyMaterialPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentStudyMaterialPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
                 showPanel("StudentMaterials", "Study Material");
             });
             
-            sidebar.addMenuButton("Events", "StudentEvents", e -> {
+            sidebar.addMenuButton("Academic Calendar", "StudentEvents", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentEventPanel) {
-                        ((com.uniportal.ui.student.StudentEventPanel) comp).loadData();
-                        break;
+                        try { try { ((com.uniportal.ui.student.StudentEventPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                     }
                 }
-                showPanel("StudentEvents", "Events & Activities");
+                showPanel("StudentEvents", "Academic Calendar");
             });
             
             sidebar.addMenuButton("Helpdesk", "StudentHelpdesk", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentHelpdeskPanel) {
-                        ((com.uniportal.ui.student.StudentHelpdeskPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentHelpdeskPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -118,7 +121,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Assignments", "StudentAssignments", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentAssignmentsPanel) {
-                        ((com.uniportal.ui.student.StudentAssignmentsPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentAssignmentsPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -128,7 +131,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Attendance", "StudentAttendance", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentAttendancePanel) {
-                        ((com.uniportal.ui.student.StudentAttendancePanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentAttendancePanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -138,7 +141,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Notices", "StudentNotices", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentNoticesPanel) {
-                        ((com.uniportal.ui.student.StudentNoticesPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentNoticesPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -148,7 +151,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Calendar", "StudentCalendar", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.student.StudentCalendarPanel) {
-                        ((com.uniportal.ui.student.StudentCalendarPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.student.StudentCalendarPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -159,21 +162,12 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Change Password", "ChangePassword", e -> new com.uniportal.ui.auth.ChangePasswordDialog(this).setVisible(true));
         } else if ("ADMIN".equals(role)) {
             sidebar.addMenuButton("Dashboard", "AdminDashboard", e -> showPanel("AdminDashboard", "Admin Dashboard"));
-            sidebar.addMenuButton("My Profile", "AdminProfile", e -> {
-                for (Component comp : contentPanel.getComponents()) {
-                    if (comp instanceof com.uniportal.ui.admin.AdminProfilePanel) {
-                        ((com.uniportal.ui.admin.AdminProfilePanel) comp).loadProfile();
-                        break;
-                    }
-                }
-                showPanel("AdminProfile", "My Profile");
-            });
             
             // Phase 4: Master Data
             sidebar.addMenuButton("Departments", "ManageDepartments", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.departments.DepartmentManagementPanel) {
-                        ((com.uniportal.ui.admin.departments.DepartmentManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.departments.DepartmentManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -182,7 +176,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Courses", "ManageCourses", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.courses.CourseManagementPanel) {
-                        ((com.uniportal.ui.admin.courses.CourseManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.courses.CourseManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -191,7 +185,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Subjects", "ManageSubjects", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.subjects.SubjectManagementPanel) {
-                        ((com.uniportal.ui.admin.subjects.SubjectManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.subjects.SubjectManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -200,7 +194,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Faculty", "ManageFaculty", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.faculty.FacultyManagementPanel) {
-                        ((com.uniportal.ui.admin.faculty.FacultyManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.faculty.FacultyManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -209,7 +203,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Students", "ManageStudents", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.students.StudentManagementPanel) {
-                        ((com.uniportal.ui.admin.students.StudentManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.students.StudentManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -218,7 +212,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Notices", "ManageNotices", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.notices.NoticeManagementPanel) {
-                        ((com.uniportal.ui.admin.notices.NoticeManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.notices.NoticeManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -227,7 +221,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Timetable", "ManageTimetable", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.timetable.TimetableManagementPanel) {
-                        ((com.uniportal.ui.admin.timetable.TimetableManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.timetable.TimetableManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -236,7 +230,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Study Material", "ManageStudyMaterial", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.studymaterial.StudyMaterialManagementPanel) {
-                        ((com.uniportal.ui.admin.studymaterial.StudyMaterialManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.studymaterial.StudyMaterialManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -245,7 +239,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Attendance", "ManageAttendance", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.attendance.AttendanceManagementPanel) {
-                        ((com.uniportal.ui.admin.attendance.AttendanceManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.attendance.AttendanceManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -254,7 +248,7 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Assignments", "ManageAssignments", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.assignments.AssignmentManagementPanel) {
-                        ((com.uniportal.ui.admin.assignments.AssignmentManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.assignments.AssignmentManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
@@ -263,25 +257,24 @@ public class MainFrame extends JFrame {
             sidebar.addMenuButton("Calendar", "ManageCalendar", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.calendar.CalendarManagementPanel) {
-                        ((com.uniportal.ui.admin.calendar.CalendarManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.calendar.CalendarManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }
                 showPanel("ManageCalendar", "Manage Calendar");
             });
-            sidebar.addMenuButton("Events", "ManageEvents", e -> {
+            sidebar.addMenuButton("Academic Calendar", "ManageEvents", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.events.EventManagementPanel) {
-                        ((com.uniportal.ui.admin.events.EventManagementPanel) comp).loadData();
-                        break;
+                        try { try { ((com.uniportal.ui.admin.events.EventManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                     }
                 }
-                showPanel("ManageEvents", "Manage Events");
+                showPanel("ManageEvents", "Academic Calendar");
             });
             sidebar.addMenuButton("Helpdesk", "ManageHelpdesk", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.helpdesk.HelpdeskManagementPanel) {
-                        ((com.uniportal.ui.admin.helpdesk.HelpdeskManagementPanel) comp).loadData();
+                        try { try { ((com.uniportal.ui.admin.helpdesk.HelpdeskManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
                         break;
                     }
                 }

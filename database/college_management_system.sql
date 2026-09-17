@@ -233,6 +233,24 @@ CREATE TABLE IF NOT EXISTS events (
 );
 
 -- --------------------------------------------------------
+-- Academic Calendar Unified
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS academic_calendar (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200),
+    description TEXT,
+    event_date DATE NOT NULL,
+    event_time TIME,
+    event_type ENUM('THEORY_EXAM', 'PRACTICAL_EXAM', 'UNIT_TEST', 'HOLIDAY', 'OTHER') DEFAULT 'OTHER',
+    duration_minutes INT,
+    subject_id INT,
+    dept_id INT, -- NULL if college-wide
+    status ENUM('SCHEDULED', 'COMPLETED', 'CANCELLED') DEFAULT 'SCHEDULED',
+    FOREIGN KEY (dept_id) REFERENCES departments(id) ON DELETE SET NULL,
+    FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL
+);
+
+-- --------------------------------------------------------
 -- Event Registrations
 -- --------------------------------------------------------
 CREATE TABLE IF NOT EXISTS event_registrations (
@@ -246,16 +264,7 @@ CREATE TABLE IF NOT EXISTS event_registrations (
     FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
 );
 
--- --------------------------------------------------------
--- Academic Calendar
--- --------------------------------------------------------
-CREATE TABLE IF NOT EXISTS academic_calendar (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    event_date DATE NOT NULL,
-    event_type VARCHAR(50) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+
 
 -- --------------------------------------------------------
 -- Helpdesk Tickets
@@ -356,7 +365,7 @@ INSERT INTO college_timetable (day_of_week, start_time, end_time, subject_id, fa
 
 -- Academic Calendar
 INSERT INTO academic_calendar (event_date, event_type, description) VALUES
-('2026-09-12', 'Examination', 'Mid-term exams start');
+('2026-09-12', 'THEORY_EXAM', 'Mid-term exams start');
 
 -- Attendance
 INSERT INTO attendance_records (student_id, subject_id, attendance_date, status) VALUES
