@@ -22,7 +22,7 @@ public class DBConnection {
     private static void initDatabase() {
         try (Connection conn = DriverManager.getConnection(DatabaseConfig.getUrl(), DatabaseConfig.getUser(), DatabaseConfig.getPassword())) {
             boolean initNeeded = true;
-            try (ResultSet rs = conn.getMetaData().getTables(null, null, "DEPARTMENTS", null)) {
+            try (ResultSet rs = conn.getMetaData().getTables(null, null, "departments", null)) {
                 if (rs.next()) {
                     initNeeded = false;
                 }
@@ -34,6 +34,7 @@ public class DBConnection {
             }
         } catch (Exception e) {
             System.err.println("Database initialization error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     

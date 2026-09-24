@@ -42,8 +42,23 @@ public class StudyMaterialManagementPanel extends JPanel {
 
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.setOpaque(false);
+        StyledButton openBtn = new StyledButton("Open File");
         StyledButton editBtn = new StyledButton("Edit");
         StyledButton deleteBtn = new StyledButton("Delete");
+
+        openBtn.addActionListener(e -> {
+            int row = table.getSelectedRow();
+            if (row != -1) {
+                StudyMaterial m = getMaterialFromRow(row);
+                if (m != null && m.getFilePath() != null && !m.getFilePath().isEmpty()) {
+                    UIUtils.openFile(this, m.getFilePath());
+                } else {
+                    UIUtils.showError(this, "No file is attached to this material.");
+                }
+            } else {
+                UIUtils.showError(this, "Please select an entry first.");
+            }
+        });
 
         editBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
@@ -73,6 +88,7 @@ public class StudyMaterialManagementPanel extends JPanel {
             }
         });
 
+        bottomPanel.add(openBtn);
         bottomPanel.add(editBtn);
         bottomPanel.add(deleteBtn);
         add(bottomPanel, BorderLayout.SOUTH);

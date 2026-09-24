@@ -35,6 +35,23 @@ public class UIUtils {
         int result = JOptionPane.showConfirmDialog(parent, message, "Confirm", JOptionPane.YES_NO_OPTION);
         return result == JOptionPane.YES_OPTION;
     }
+
+    public static void openFile(Component parent, String filePath) {
+        try {
+            java.io.File file = new java.io.File(filePath);
+            if (file.exists()) {
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    java.awt.Desktop.getDesktop().open(file);
+                } else {
+                    showError(parent, "Desktop is not supported on this platform.");
+                }
+            } else {
+                showError(parent, "File not found: " + file.getAbsolutePath());
+            }
+        } catch (Exception ex) {
+            showError(parent, "Error opening file: " + ex.getMessage());
+        }
+    }
     
     // Standard Colors (Modern UI)
     public static final Color COLOR_PRIMARY = new Color(10, 35, 66); // Dark Navy Blue

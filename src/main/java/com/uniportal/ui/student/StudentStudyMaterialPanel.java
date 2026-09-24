@@ -46,12 +46,16 @@ public class StudentStudyMaterialPanel extends JPanel {
         
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bottomPanel.setOpaque(false);
-        JButton downloadBtn = new JButton("View File Details");
+        JButton downloadBtn = new JButton("Open File");
         downloadBtn.addActionListener(e -> {
             int row = table.getSelectedRow();
             if (row != -1) {
                 StudyMaterial m = materialList.get(row);
-                UIUtils.showSuccess(this, "File: " + m.getFileName() + "\nPath: " + m.getFilePath() + "\n\n(Simulated download)");
+                if (m.getFilePath() != null && !m.getFilePath().isEmpty()) {
+                    UIUtils.openFile(this, m.getFilePath());
+                } else {
+                    UIUtils.showError(this, "No file is attached to this material.");
+                }
             } else {
                 UIUtils.showError(this, "Please select a material first.");
             }

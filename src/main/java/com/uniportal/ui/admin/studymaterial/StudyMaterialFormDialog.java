@@ -8,6 +8,11 @@ import com.uniportal.ui.common.StyledButton;
 import com.uniportal.util.UIUtils;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 public class StudyMaterialFormDialog extends JDialog {
@@ -17,6 +22,8 @@ public class StudyMaterialFormDialog extends JDialog {
     private JTextArea descArea;
     private JTextField fileNameField;
     private JTextField filePathField;
+    private JButton browseBtn;
+    private File selectedFile;
     
     private StudyMaterial material;
     private StudyMaterialService service;
@@ -61,9 +68,15 @@ public class StudyMaterialFormDialog extends JDialog {
         gbc.gridx = 1; formPanel.add(fileNameField, gbc);
         row++;
         
-        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("File Path/URL:"), gbc);
-        filePathField = new JTextField(20);
-        gbc.gridx = 1; formPanel.add(filePathField, gbc);
+        gbc.gridx = 0; gbc.gridy = row; formPanel.add(new JLabel("File Path:"), gbc);
+        JPanel filePanel = new JPanel(new BorderLayout(5, 0));
+        filePathField = new JTextField(15);
+        filePathField.setEditable(false);
+        browseBtn = new JButton("Browse...");
+        browseBtn.addActionListener(e -> chooseFile());
+        filePanel.add(filePathField, BorderLayout.CENTER);
+        filePanel.add(browseBtn, BorderLayout.EAST);
+        gbc.gridx = 1; formPanel.add(filePanel, gbc);
         
         add(formPanel, BorderLayout.CENTER);
         
@@ -83,6 +96,9 @@ public class StudyMaterialFormDialog extends JDialog {
             descArea.setText(material.getDescription());
             fileNameField.setText(material.getFileName());
             filePathField.setText(material.getFilePath());
+            if (material.getFilePath() != null && !material.getFilePath().isEmpty()) {
+                selectedFile = new File(material.getFilePath());
+            }
             
             for (int i = 0; i < subjectCombo.getItemCount(); i++) {
                 if (subjectCombo.getItemAt(i).id == material.getSubjectId()) {
@@ -90,6 +106,15 @@ public class StudyMaterialFormDialog extends JDialog {
                     break;
                 }
             }
+        }
+    }
+    
+    private void chooseFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            selectedFile = fileChooser.getSelectedFile();
+            filePathField.setText(selectedFile.getAbsolutePath());
+            fileNameField.setText(selectedFile.getName());
         }
     }
     
@@ -110,8 +135,28 @@ public class StudyMaterialFormDialog extends JDialog {
             if (selSubj != null) m.setSubjectId(selSubj.id);
             
             m.setDescription(descArea.getText().trim());
-            m.setFileName(fileNameField.getText().trim());
-            m.setFilePath(filePathField.getText().trim());
+            
+            String finalFilePath = filePathField.getText().trim();
+            String finalFileName = fileNameField.getText().trim();
+            
+            if (selectedFile != null && selectedFile.exists()) {
+                // If it's a new file (not already in uploads dir)
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "uploads", "study_materials");
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+                
+                Path targetPath = uploadDir.resolve(selectedFile.getName());
+                // Only copy if source and target are different
+                if (!selectedFile.toPath().toAbsolutePath().equals(targetPath.toAbsolutePath())) {
+                    Files.copy(selectedFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    finalFilePath = targetPath.toAbsolutePath().toString();
+                    finalFileName = selectedFile.getName();
+                }
+            }
+            
+            m.setFileName(finalFileName);
+            m.setFilePath(finalFilePath);
             
             if (material == null) {
                 service.addStudyMaterial(m);
