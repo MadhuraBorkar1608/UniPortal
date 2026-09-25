@@ -61,10 +61,26 @@ public class MainFrame extends JFrame {
         return sidebar;
     }
     
+    public String getCurrentUserDisplayName() {
+        if (!SessionManager.isAuthenticated()) return "";
+        String role = SessionManager.getCurrentUser().getRole();
+        String name = SessionManager.getCurrentUser().getUsername();
+        if ("STUDENT".equals(role)) {
+            try {
+                com.uniportal.dao.StudentDAO studentDAO = new com.uniportal.dao.StudentDAO();
+                com.uniportal.model.Student student = studentDAO.getStudentByUserId(SessionManager.getCurrentUser().getId());
+                if (student != null && student.getFullName() != null) {
+                    name = student.getFullName();
+                }
+            } catch (Exception e) {}
+        }
+        return name;
+    }
+
     public void refreshUserInfo() {
         if (SessionManager.isAuthenticated()) {
             String role = SessionManager.getCurrentUser().getRole();
-            String name = SessionManager.getCurrentUser().getUsername();
+            String name = getCurrentUserDisplayName();
             header.setUserInfo(name, role);
             setupSidebar(role);
         } else {
@@ -77,7 +93,7 @@ public class MainFrame extends JFrame {
         sidebar.setMenuStateForRole(role);
         
         if ("STUDENT".equals(role)) {
-            sidebar.addMenuButton("Dashboard", "StudentDashboard", e -> showPanel("StudentDashboard", "Student Dashboard"));
+            sidebar.addMenuButton("Dashboard", "StudentDashboard", e -> showPanel("StudentDashboard", "Good Morning, " + getCurrentUserDisplayName() + "!"));
             
             sidebar.addMenuButton("My Timetable", "StudentTimetable", e -> {
                 for (Component comp : contentPanel.getComponents()) {
@@ -148,8 +164,7 @@ public class MainFrame extends JFrame {
                 showPanel("StudentNotices", "Notices");
             });
 
-            // Add stubs for future menus
-            sidebar.addMenuButton("Change Password", "ChangePassword", e -> new com.uniportal.ui.auth.ChangePasswordDialog(this).setVisible(true));
+
         } else if ("ADMIN".equals(role)) {
             sidebar.addMenuButton("Dashboard", "AdminDashboard", e -> showPanel("AdminDashboard", "Admin Dashboard"));
             
@@ -244,15 +259,6 @@ public class MainFrame extends JFrame {
                 }
                 showPanel("ManageAssignments", "Manage Assignments");
             });
-            sidebar.addMenuButton("Calendar", "ManageCalendar", e -> {
-                for (Component comp : contentPanel.getComponents()) {
-                    if (comp instanceof com.uniportal.ui.admin.calendar.CalendarManagementPanel) {
-                        try { try { ((com.uniportal.ui.admin.calendar.CalendarManagementPanel) comp).loadData(); } catch (Exception ex) {} } catch (Exception ex) { ex.printStackTrace(); }
-                        break;
-                    }
-                }
-                showPanel("ManageCalendar", "Manage Calendar");
-            });
             sidebar.addMenuButton("Academic Calendar", "ManageEvents", e -> {
                 for (Component comp : contentPanel.getComponents()) {
                     if (comp instanceof com.uniportal.ui.admin.events.EventManagementPanel) {
@@ -271,11 +277,7 @@ public class MainFrame extends JFrame {
                 showPanel("ManageHelpdesk", "Manage Helpdesk");
             });
             
-            // Add stubs for future menus
-            sidebar.addMenuButton("Change Password", "ChangePassword", e -> new com.uniportal.ui.auth.ChangePasswordDialog(this).setVisible(true));
         }
-        
-        sidebar.addMenuButton("Logout", "Logout", e -> logout());
         sidebar.revalidate();
         sidebar.repaint();
     }

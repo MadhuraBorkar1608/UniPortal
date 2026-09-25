@@ -50,14 +50,14 @@ public class StudentEventPanel extends JPanel {
         if (SessionManager.isAuthenticated()) {
             Student s = studentService.getStudentProfile(SessionManager.getCurrentUser().getId());
             if (s != null) {
-                eventList = eventService.getUpcomingEvents(s.getStudentId(), s.getDeptId());
+                eventList = eventService.getAllEvents();
                 for (CalendarEvent e : eventList) {
                     tableModel.addRow(new Object[]{
                         e.getEventType(),
                         e.getTitle(), 
-                        e.getEventDate().toString(), 
-                        e.getEventTime().toString(),
-                        e.getDurationMinutes() + " mins", 
+                        e.getEventDate() != null ? e.getEventDate().toString() : "TBD", 
+                        e.getEventTime() != null ? e.getEventTime().toString() : "TBD",
+                        e.getDurationMinutes() > 0 ? e.getDurationMinutes() + " mins" : "-", 
                         e.getStatus()
                     });
                 }

@@ -44,6 +44,22 @@ public class StudentNoticesPanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
+        
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    int modelRow = table.convertRowIndexToModel(row);
+                    String title = (String) tableModel.getValueAt(modelRow, 1);
+                    String desc = (String) tableModel.getValueAt(modelRow, 4);
+                    JOptionPane.showMessageDialog(StudentNoticesPanel.this,
+                        desc,
+                        title,
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
     }
 
     public void loadData() {

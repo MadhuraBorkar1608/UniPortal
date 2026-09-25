@@ -55,19 +55,34 @@ public class AdminProfilePanel extends JPanel {
         phoneField = addEditableField(formPanel, gbc, row++, "Phone:", currentAdmin.getPhone());
         designationField = addEditableField(formPanel, gbc, row++, "Designation:", currentAdmin.getDesignation());
         
-        StyledButton saveBtn = new StyledButton("Save Changes");
-        saveBtn.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveProfile();
-            }
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setOpaque(false);
+
+        StyledButton changePasswordBtn = new StyledButton("Change Password");
+        changePasswordBtn.setBackground(new Color(108, 117, 125));
+        changePasswordBtn.addActionListener(e -> new com.uniportal.ui.auth.ChangePasswordDialog((JFrame) SwingUtilities.getWindowAncestor(this)).setVisible(true));
+
+        StyledButton logoutBtn = new StyledButton("Logout");
+        logoutBtn.setBackground(new Color(220, 53, 69));
+        logoutBtn.addActionListener(e -> {
+            com.uniportal.util.SessionManager.logout();
+            com.uniportal.Main.getMainFrame().showPanel("Login", "Login");
+            com.uniportal.Main.getMainFrame().refreshUserInfo();
         });
+
+        StyledButton saveBtn = new StyledButton("Save Changes");
+        saveBtn.addActionListener(e -> saveProfile());
         
-        gbc.gridx = 1;
+        buttonPanel.add(changePasswordBtn);
+        buttonPanel.add(logoutBtn);
+        buttonPanel.add(saveBtn);
+        
+        gbc.gridx = 0;
+        gbc.gridwidth = 2;
         gbc.gridy = row;
         gbc.anchor = GridBagConstraints.EAST;
         gbc.fill = GridBagConstraints.NONE;
-        formPanel.add(saveBtn, gbc);
+        formPanel.add(buttonPanel, gbc);
 
         JPanel centerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         centerPanel.setOpaque(false);

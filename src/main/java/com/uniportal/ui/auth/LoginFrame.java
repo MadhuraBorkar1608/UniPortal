@@ -93,13 +93,11 @@ public class LoginFrame extends JPanel {
                 adminToggle.setForeground(Color.WHITE);
                 studentToggle.setBackground(new Color(230, 235, 240));
                 studentToggle.setForeground(Color.BLACK);
-                usernameField.setText("admin");
             } else {
                 studentToggle.setBackground(new Color(10, 35, 66));
                 studentToggle.setForeground(Color.WHITE);
                 adminToggle.setBackground(new Color(230, 235, 240));
                 adminToggle.setForeground(Color.BLACK);
-                usernameField.setText("STU001");
             }
         };
         adminToggle.addActionListener(toggleListener);
@@ -117,7 +115,6 @@ public class LoginFrame extends JPanel {
         usernameField.putClientProperty("JTextField.placeholderText", "Username");
         usernameField.setPreferredSize(new Dimension(300, 45));
         usernameField.setFont(UIUtils.FONT_NORMAL);
-        usernameField.setText("STU001");
         formPanel.add(usernameField, gbc);
 
         gbc.gridy = 4;
@@ -126,30 +123,11 @@ public class LoginFrame extends JPanel {
         passwordField.putClientProperty("JTextField.showRevealButton", true);
         passwordField.setPreferredSize(new Dimension(300, 45));
         passwordField.setFont(UIUtils.FONT_NORMAL);
-        passwordField.setText("password");
         formPanel.add(passwordField, gbc);
-        
-        // Remember me and Forgot Password
-        gbc.gridy = 5;
-        gbc.gridwidth = 1;
-        gbc.insets = new Insets(5, 10, 20, 5);
-        JCheckBox rememberCheck = new JCheckBox("Remember me");
-        rememberCheck.setFont(UIUtils.FONT_SMALL);
-        rememberCheck.setOpaque(false);
-        formPanel.add(rememberCheck, gbc);
-        
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = new Insets(5, 5, 20, 10);
-        JLabel forgotLabel = new JLabel("<html><a href='#'>Forgot Password?</a></html>");
-        forgotLabel.setFont(UIUtils.FONT_SMALL);
-        forgotLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        formPanel.add(forgotLabel, gbc);
         
         // Login Button
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -160,7 +138,7 @@ public class LoginFrame extends JPanel {
         formPanel.add(loginBtn, gbc);
         
         // Links
-        gbc.gridy = 7;
+        gbc.gridy = 6;
         gbc.insets = new Insets(10, 10, 10, 10);
         JLabel linkLabel = new JLabel("<html>Don't have an account? <a href='#'>Contact Admin</a></html>");
         linkLabel.setFont(UIUtils.FONT_SMALL);
@@ -187,7 +165,7 @@ public class LoginFrame extends JPanel {
                 if ("ADMIN".equals(role)) {
                     Main.getMainFrame().showPanel("AdminDashboard", "Admin Dashboard");
                 } else if ("STUDENT".equals(role)) {
-                    Main.getMainFrame().showPanel("StudentDashboard", "Good Morning, " + com.uniportal.util.SessionManager.getCurrentUser().getUsername() + "!");
+                    Main.getMainFrame().showPanel("StudentDashboard", "Good Morning, " + Main.getMainFrame().getCurrentUserDisplayName() + "!");
                 }
             }
         } catch (Exception ex) {

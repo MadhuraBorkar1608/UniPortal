@@ -58,6 +58,12 @@ public class TimetableMatrixPanel extends JPanel {
             
             for (int i = 1; i < columns.size(); i++) {
                 String day = columns.get(i);
+                
+                if (slot.equals("13:00:00 - 14:00:00")) {
+                    rowData[i] = "<html><div style='text-align: center; color: #888888; font-style: italic;'>Lunch Break</div></html>";
+                    continue;
+                }
+                
                 // Find timetable entry for this day and slot
                 Timetable match = null;
                 for (Timetable t : entries) {

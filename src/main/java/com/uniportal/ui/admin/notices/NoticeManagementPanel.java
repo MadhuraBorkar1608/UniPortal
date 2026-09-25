@@ -99,6 +99,22 @@ public class NoticeManagementPanel extends JPanel {
         bottomPanel.add(deleteBtn);
         bottomPanel.add(publishBtn);
         add(bottomPanel, BorderLayout.SOUTH);
+        
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int row = table.rowAtPoint(e.getPoint());
+                if (row >= 0) {
+                    Notice n = getNoticeFromRow(row);
+                    if (n != null) {
+                        JOptionPane.showMessageDialog(NoticeManagementPanel.this,
+                            n.getDescription(),
+                            n.getTitle(),
+                            JOptionPane.INFORMATION_MESSAGE);
+                    }
+                }
+            }
+        });
     }
 
     public void loadData() {
@@ -110,8 +126,9 @@ public class NoticeManagementPanel extends JPanel {
         }
     }
 
-    private Notice getNoticeFromRow(int row) {
-        int id = (int) tableModel.getValueAt(row, 0);
+    private Notice getNoticeFromRow(int viewRow) {
+        int modelRow = table.convertRowIndexToModel(viewRow);
+        int id = (int) tableModel.getValueAt(modelRow, 0);
         // Better to fetch from DB or find in list to get all details like description
         List<Notice> list = service.getAllNotices();
         for(Notice n : list) {
