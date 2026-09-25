@@ -22,7 +22,19 @@ public class SidebarPanel extends JPanel {
         // Logo / Title area
         JPanel logoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 30));
         logoPanel.setOpaque(false);
-        JLabel logoIcon = new JLabel(UIManager.getIcon("OptionPane.informationIcon")); // Placeholder
+        JLabel logoIcon = new JLabel(); 
+        try {
+            java.net.URL imgUrl = getClass().getResource("/logo.png");
+            if (imgUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(imgUrl);
+                Image img = originalIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                logoIcon.setIcon(new ImageIcon(img));
+            } else {
+                logoIcon.setIcon(UIManager.getIcon("OptionPane.informationIcon"));
+            }
+        } catch (Exception e) {
+            logoIcon.setIcon(UIManager.getIcon("OptionPane.informationIcon"));
+        }
         JLabel logoLabel = new JLabel("UniPortal");
         logoLabel.setFont(UIUtils.FONT_TITLE.deriveFont(22f));
         logoLabel.setForeground(Color.WHITE);

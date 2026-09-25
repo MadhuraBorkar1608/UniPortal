@@ -30,10 +30,24 @@ public class LoginFrame extends JPanel {
         gbcContainer.anchor = GridBagConstraints.CENTER;
 
         // App Name above the form
+        JPanel brandPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 0));
+        brandPanel.setOpaque(false);
+        try {
+            java.net.URL imgUrl = getClass().getResource("/logo.png");
+            if (imgUrl != null) {
+                ImageIcon originalIcon = new ImageIcon(imgUrl);
+                Image img = originalIcon.getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+                JLabel logoLabel = new JLabel(new ImageIcon(img));
+                brandPanel.add(logoLabel);
+            }
+        } catch (Exception e) {}
+        
         JLabel appTitle = new JLabel("UniPortal");
         appTitle.setFont(new Font("Inter", Font.BOLD, 48));
         appTitle.setForeground(UIUtils.COLOR_PRIMARY);
-        centerContainer.add(appTitle, gbcContainer);
+        brandPanel.add(appTitle);
+        
+        centerContainer.add(brandPanel, gbcContainer);
 
         // Form Panel
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -144,6 +158,17 @@ public class LoginFrame extends JPanel {
         linkLabel.setFont(UIUtils.FONT_SMALL);
         linkLabel.setHorizontalAlignment(SwingConstants.CENTER);
         linkLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        linkLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                JOptionPane.showMessageDialog(
+                    LoginFrame.this,
+                    "Please contact the University Administration to request an account.\n\nEmail: admin@uniportal.edu\nPhone: +1 (555) 123-4567",
+                    "Contact Administrator",
+                    JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        });
         formPanel.add(linkLabel, gbc);
 
         gbcContainer.gridy = 1;

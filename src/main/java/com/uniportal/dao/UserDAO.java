@@ -10,7 +10,7 @@ import java.sql.SQLException;
 public class UserDAO {
 
     public User getUserByUsername(String username) {
-        String query = "SELECT * FROM users WHERE username = ?";
+        String query = "SELECT * FROM users WHERE LOWER(username) = LOWER(?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             

@@ -394,6 +394,12 @@ INSERT INTO helpdesk_tickets (ticket_id, student_id, category, subject, descript
 INSERT INTO assignments (title, subject_id, description, deadline) VALUES
 ('Java Programming Assignment 3', 1, 'Implement OOP concepts.', '2026-09-10 23:59:00');
 
+-- Study Material
+INSERT INTO study_material (title, subject_id, description, file_name, file_path) VALUES 
+('Data Structures Lecture Notes', 1, 'Notes covering arrays, linked lists, and trees.', 'DS_Notes.pdf', '/uploads/DS_Notes.pdf'),
+('Algorithms Problem Set', 2, 'Practice problems for dynamic programming.', 'Algo_Problems.pdf', '/uploads/Algo_Problems.pdf'),
+('Database Normalization Guide', 3, 'Comprehensive guide on 1NF to BCNF.', 'DB_Normalization.pdf', '/uploads/DB_Normalization.pdf');
+
 -- Timetable
 INSERT INTO college_timetable (day_of_week, start_time, end_time, subject_id, faculty_id, classroom, division) VALUES 
 ('MONDAY', '10:00:00', '11:00:00', 1, 'FAC001', 'Room 101', 'A'),

@@ -78,7 +78,23 @@ public class AdminDashboardPanel extends JPanel {
         cardsPanel.add(createSummaryCard("Open Tickets", openTickets, new Color(255, 193, 7)));
         cardsPanel.add(createSummaryCard("Avg Attendance", avgAttendance, new Color(32, 201, 151)));
         
-        centerContent.add(cardsPanel, BorderLayout.NORTH);
+        JPanel topSection = new JPanel(new BorderLayout(0, 20));
+        topSection.setOpaque(false);
+        topSection.add(cardsPanel, BorderLayout.CENTER);
+        
+        JPanel quickActions = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        quickActions.setOpaque(false);
+        com.uniportal.ui.common.StyledButton addStudentBtn = new com.uniportal.ui.common.StyledButton("➕ Quick Add Student");
+        addStudentBtn.addActionListener(e -> {
+            com.uniportal.service.StudentService sService = new com.uniportal.service.StudentService();
+            com.uniportal.ui.admin.students.StudentFormDialog dialog = new com.uniportal.ui.admin.students.StudentFormDialog(SwingUtilities.getWindowAncestor(this), null, sService);
+            dialog.setVisible(true);
+        });
+        quickActions.add(addStudentBtn);
+        
+        topSection.add(quickActions, BorderLayout.NORTH);
+        
+        centerContent.add(topSection, BorderLayout.NORTH);
         
         // Notice panel in the center
         JPanel bottomContent = new JPanel(new GridLayout(1, 3, 20, 0));
